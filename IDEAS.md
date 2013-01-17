@@ -8,3 +8,5 @@ Look at box office gross versus other factors and attempt to assign causality:
 * actors, directors, screen writers, producers, EP, studio
 
 ## Summary of the Case For Mars plan
+
+## Getting started on Paleo with lots of resources
