@@ -29,3 +29,5 @@ How stable are P and K across leagues/years/teams?
 * How do you factor out things that coaches decide like who takes corners/PKs/FKs? Maybe negative for turnovers and shots off frame account for this?
 
 What about for keepers? (separate problem)
+
+## Write about deployment and Neckbeard
