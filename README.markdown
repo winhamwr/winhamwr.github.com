@@ -1,3 +1,44 @@
+## Getting started
+
+Because I always forget how to use RVM.
+
+### Install RVM
+
+Use the [RVM docs](https://rvm.io)
+
+### Use the `source` branch
+
+The master branch is the statically-built
+deployable version.
+Change things on the `source` branch.
+
+    $ git clone git@github.com:winhamwr/winhamwr.github.com.git
+    $ cd winhamwr.github.com
+    $ git checkout source
+
+Note: If you get a message about installing ruby when you cd,
+follow the instructions
+to install that version with `rvm`.
+
+### Install all the things
+
+    $ bundle install
+
+## Create a new blog post
+
+    $ rake new_post["Awesome New Title"]
+    $ gvim source/_posts/<date>-awesome-new-title.markdown
+
+hack hack hack
+
+    $ git commit source/_posts/<date>-awesome-new-title.markdown
+    $ git push
+
+## Deploy
+
+I forget?
+
+
 ## What is Octopress?
 
 Octopress is [Jekyll](https://github.com/mojombo/jekyll) blogging at its finest.
