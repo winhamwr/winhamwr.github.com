@@ -22,6 +22,9 @@ to install that version with `rvm`.
 
 ### Install all the things
 
+    $ rvm install 1.9.2
+    $ rvm gemset winhamwr_blog
+    $ rvm 1.9.2@winhamwr_blog
     $ bundle install
 
 ## Create a new blog post
@@ -34,9 +37,17 @@ hack hack hack
     $ git commit source/_posts/<date>-awesome-new-title.markdown
     $ git push
 
+## One-time Deployment Setup
+
+    $ mkdir _deploy
+    $ cd _deploy
+    $ git init
+    $ git remote add origin git@github.com:winhamwr/winhamwr.github.com.git
+
+
 ## Deploy
 
-I forget?
+    $ rake gen_deploy
 
 
 ## What is Octopress?
