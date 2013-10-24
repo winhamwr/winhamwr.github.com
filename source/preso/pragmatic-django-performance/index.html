@@ -223,7 +223,7 @@ cloudreviews.com</a>
 </ul>
 </div>
 </div><div class="slide" data-transition="none"><div class="content code fullscreen" ref="content/01_slide/21">
-<pre><code># my_template.html
+<pre class="sh_html"><code>&lt;!-- my_template.html --&gt;
 
 {% load compress %}
 
@@ -232,8 +232,7 @@ cloudreviews.com</a>
     href="/static/css/one.css" type="text/css"&gt;
 &lt;link rel="stylesheet"
     href="/static/css/two.css" type="text/css"&gt;
-{% endcompress %}
-</code></pre></div>
+{% endcompress %}</code></pre></div>
 </div><div class="slide" data-transition="none"><div class="content fullscreen center" ref="content/01_slide/22">
 <p><img src="./file/content/network_panel.png" width="1198" height="727"/></p>
 
@@ -262,14 +261,13 @@ cloudreviews.com</a>
 </ul>
 </div>
 </div><div class="slide" data-transition="none"><div class="content code" ref="content/01_slide/26">
-<pre><code># settings.py
+<pre class="sh_python"><code># settings.py
 
 MIDDLEWARE_CLASSES = (
     'johnny.middleware.LocalStoreClearMiddleware',
     'johnny.middleware.QueryCacheMiddleware',
     # ...
-)
-</code></pre></div>
+)</code></pre></div>
 </div><div class="slide" data-transition="none"><div class="content bullets" ref="content/01_slide/27">
 <h1>Database 20%: Slow Query Log</h1>
 
@@ -281,48 +279,42 @@ MIDDLEWARE_CLASSES = (
 </div><div class="slide" data-transition="none"><div class="content subsection" ref="content/01_slide/28">
 <h1>Enable the Slow Query Log</h1></div>
 </div><div class="slide" data-transition="none"><div class="content code" ref="content/01_slide/29">
-<pre><code># /etc/mysql/conf.d/slow_query.cnf
+<pre class="sh_makefile"><code># /etc/mysql/conf.d/slow_query.cnf
 
 slow_query_log = 1
 long_query_time = .1
-log_queries_not_using_indexes = 1
-</code></pre></div>
+log_queries_not_using_indexes = 1</code></pre></div>
 </div><div class="slide" data-transition="none"><div class="content subsection" ref="content/01_slide/30">
 <h1>Read the Slow Query Log</h1></div>
 </div><div class="slide" data-transition="none"><div class="content code" ref="content/01_slide/31">
-<pre><code># Time: 130823 13:45:48
+<pre class="sh_sql"><code># Time: 130823 13:45:48
 # User@Host: live0[live0] @ URL[IP]
 # Query_time: 10.454075  Lock_time: 0.000085
-    Rows_sent: 20  Rows_examined: 149654
+# Rows_sent: 20  Rows_examined: 149654
 use policystat;
-SET timestamp=1377265548;
-</code></pre></div>
+SET timestamp=1377265548;</code></pre></div>
 </div><div class="slide" data-transition="none"><div class="content code" ref="content/01_slide/32">
 <h1>How bad was it?</h1>
 
-<pre><code># Query_time: 10.454075  Lock_time: 0.000085
-    Rows_sent: 20  Rows_examined: 149654
-</code></pre></div>
+<pre class="sh_sql"><code># Query_time: 10.454075  Lock_time: 0.000085
+# Rows_sent: 20  Rows_examined: 149654</code></pre></div>
 </div><div class="slide" data-transition="none"><div class="content code" ref="content/01_slide/33">
 <h1>When was it?</h1>
 
-<pre><code>SET timestamp=1377265548;
-</code></pre></div>
+<pre class="sh_sql"><code>SET timestamp=1377265548;</code></pre></div>
 </div><div class="slide" data-transition="none"><div class="content code" ref="content/01_slide/34">
-<pre><code>SELECT `auth_user`.`id`, ...snip...
+<pre class="sh_sql"><code>SELECT `auth_user`.`id`, ...snip...
 FROM `auth_user` LEFT OUTER JOIN `pstat_profile`
   ON (`auth_user`.`id` = `pstat_profile`.`user_id`)
   INNER JOIN `pstat_tenant`
-    ON (`pstat_profile`.`tenant_id` = `pstat_tenant`.`id`)
-</code></pre></div>
+    ON (`pstat_profile`.`tenant_id` = `pstat_tenant`.`id`)</code></pre></div>
 </div><div class="slide" data-transition="none"><div class="content code" ref="content/01_slide/35">
-<pre><code>WHERE (`pstat_profile`.`is_guest` = 0
+<pre class="sh_sql"><code>WHERE (`pstat_profile`.`is_guest` = 0
   AND `pstat_profile`.`tenant_id` IN (
     301, ...snip... 356)
   AND `auth_user`.`is_superuser` = 0
   AND `auth_user`.`is_active` = 1
-)
-</code></pre></div>
+)</code></pre></div>
 </div><div class="slide" data-transition="none"><div class="content bullets" ref="content/01_slide/36">
 <h1>Where clause across tables</h1>
 
@@ -334,11 +326,10 @@ FROM `auth_user` LEFT OUTER JOIN `pstat_profile`
 </ul>
 </div>
 </div><div class="slide" data-transition="none"><div class="content code" ref="content/01_slide/37">
-<pre><code>ORDER BY `auth_user`.`last_name` ASC,
+<pre class="sh_sql"><code>ORDER BY `auth_user`.`last_name` ASC,
 `auth_user`.`first_name` ASC,
 `auth_user`.`username` ASC
-LIMIT 20;
-</code></pre></div>
+LIMIT 20;</code></pre></div>
 </div><div class="slide" data-transition="none"><div class="content bullets" ref="content/01_slide/38">
 <h1>Complex <code>ORDER BY</code></h1>
 
@@ -369,7 +360,9 @@ LIMIT 20;
 </ul>
 </div>
 </div><div class="slide" data-transition="none"><div class="content code" ref="content/01_slide/42">
-<pre><code>TEMPLATE_LOADERS = (
+<pre class="sh_python"><code># settings.py
+
+TEMPLATE_LOADERS = (
 (
   'django.template.loaders.cached.Loader',
   (
@@ -377,8 +370,7 @@ LIMIT 20;
     'django.template.loaders.app_directories.Loader',
   )
 ),
-)
-</code></pre></div>
+)</code></pre></div>
 </div><div class="slide" data-transition="none"><div class="content subsection" ref="content/01_slide/43">
 <h1>Anti-pattern 4: Query all the things!</h1></div>
 </div><div class="slide" data-transition="none"><div class="content bullets" ref="content/01_slide/44">
@@ -391,14 +383,15 @@ LIMIT 20;
 </ul>
 </div>
 </div><div class="slide" data-transition="none"><div class="content code" ref="content/01_slide/45">
-<pre><code># views.py
-
+<pre class="sh_python"><code># views.py
 context = {
     'my_things': MyThing.objects.filter(foo=bar)
-}
+}</code></pre>
 
-# my_template.html
+<!-- separator -->
 
+
+<pre class="sh_html"><code>&lt;!-- my_template.html --&gt;
 &lt;table&gt;
 {% for my_thing in my_things %}
     &lt;tr&gt;
@@ -406,23 +399,23 @@ context = {
         &lt;td&gt;{{ my_thing.other_thing.name }}&lt;/td&gt;
     &lt;tr&gt;
 {% endfor %}
-&lt;/table&gt;
-</code></pre></div>
+&lt;/table&gt;</code></pre></div>
 </div><div class="slide" data-transition="none"><div class="content subsection" ref="content/01_slide/46">
 <h1>See the fail?</h1></div>
 </div><div class="slide" data-transition="none"><div class="content code" ref="content/01_slide/47">
-<pre><code># views.py
+<p><code>select_related()</code> to the rescue!</p>
+
+<pre class="sh_python"><code># views.py
 
 context = {
     'my_things': MyThing.objects.filter(
         foo=bar
     ).select_related('other_thing__name')
-}
-</code></pre></div>
+}</code></pre></div>
 </div><div class="slide" data-transition="none"><div class="content subsection" ref="content/01_slide/48">
 <h1>Automate catching this fail!</h1></div>
 </div><div class="slide" data-transition="none"><div class="content code" ref="content/01_slide/49">
-<pre><code># views.py
+<pre class="sh_python"><code># views.py
 
 def test_query_growth(self):
     expected_queries = FuzzyInteger(10, 13)
@@ -435,8 +428,7 @@ def test_query_growth(self):
     # Make 5 more MyThing objects
 
     with self.assertNumQueries(expected_queries):
-        # Load the view again
-</code></pre></div>
+        # Load the view again</code></pre></div>
 </div><div class="slide" data-transition="none"><div class="content bullets" ref="content/01_slide/50">
 <h1>Focus on the easy wins</h1>
 
