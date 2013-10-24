@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
+    <url>
+        <loc>
+            http://winhamwr.github.com/blog/2013/01/29/the-perverse-incentives-of-public-healthcare/
+        </loc>
+        <lastmod>2013-10-24T11:00:59-04:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://winhamwr.github.com/blog/2013/08/14/how-dotcloud-is-demonitizing-paas-with-docker/
+        </loc>
+        <lastmod>2013-10-24T11:00:59-04:00</lastmod>
+    </url>
+    <url>
+        <loc>http://winhamwr.github.com/</loc>
+        <lastmod>2013-10-24T11:00:59-04:00</lastmod>
+    </url>
+    <url>
+        <loc>http://winhamwr.github.com/blog/archives/</loc>
+        <lastmod>2013-10-24T11:00:59-04:00</lastmod>
+    </url>
+</urlset>

@@ -1,0 +1,628 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title>Explicitly Normative</title>
+  <link href="http://winhamwr.github.com/atom.xml" rel="self"/>
+  <link href="http://winhamwr.github.com/"/>
+  <updated>2013-10-24T13:53:19-04:00</updated>
+  <id>http://winhamwr.github.com/</id>
+  <author>
+    <name>Wes Winham</name>
+    
+  </author>
+
+  
+  <entry>
+    <title>How dotCloud Is Demonitizing PaaS With Docker</title>
+    <link href="http://winhamwr.github.com/blog/2013/08/14/how-dotcloud-is-demonitizing-paas-with-docker/"/>
+    <updated>2013-08-14T15:17:00-04:00</updated>
+    <id>http://winhamwr.github.com/blog/2013/08/14/how-dotcloud-is-demonitizing-paas-with-docker</id>
+    <content type="html">&lt;p&gt;Anyway,
+it finally clicked for me
+that lightweight containerization is the missing piece in my plans
+for an open source deployment tool to &amp;#8220;demonitize&amp;#8221; the current crop
+of &amp;#8220;git push heroku&amp;#8221; PaaS  providers.
+&lt;em&gt;evil pinkie finger&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;These problems are solved or very solvable with current tools:&lt;/p&gt;
+
+&lt;h2&gt;Solved (or mostly-solved) problems&lt;/h2&gt;
+
+&lt;h3&gt;Application Builders&lt;/h3&gt;
+
+&lt;p&gt;Tools to package up your &amp;#8220;application&amp;#8221;
+(rails, node.js, python, Java, etc)
+with all of it&amp;#8217;s dependencies
+and define a clear way to run that application.
+All of the things that wrap around
+language-specific dependency management tools:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;http://bundler.io/&quot;&gt;bundler&lt;/a&gt; with
+&lt;a href=&quot;https://rvm.io/&quot;&gt;rvm&lt;/a&gt;
+or &lt;a href=&quot;https://github.com/sstephenson/rbenv&quot;&gt;rbenv&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;http://www.pip-installer.org/en/latest/&quot;&gt;pip&lt;/a&gt;,
+&lt;a href=&quot;http://www.virtualenv.org/&quot;&gt;virtualenv&lt;/a&gt;,
+&lt;a href=&quot;https://github.com/PolicyStat/terrarium&quot;&gt;terrarium&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://npmjs.org/&quot;&gt;npm&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;http://en.wikipedia.org/wiki/WAR_file_format_(Sun&quot;&gt;Java WAR files&lt;/a&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;h4&gt;Current Solutions&lt;/h4&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://devcenter.heroku.com/articles/buildpacks&quot;&gt;Heroku Buildpacks&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/progrium/buildstep&quot;&gt;buildstep&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;h3&gt;Configuration Management&lt;/h3&gt;
+
+&lt;p&gt;This is the level above application builds
+and good config management will use an application builder as well.
+Defining things like what should be installed on a machine
+(packages)
+and what their config files should be.&lt;/p&gt;
+
+&lt;h4&gt;Current Solutions&lt;/h4&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Chef&lt;/li&gt;
+&lt;li&gt;Puppet&lt;/li&gt;
+&lt;li&gt;Saltstack&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;h3&gt;Orchestration&lt;/h3&gt;
+
+&lt;p&gt;This is the level above Configuration Management,
+which defines how chunks of config management should work together
+&lt;strong&gt;in motion&lt;/strong&gt;.
+It strings together different components,
+eg some web server processes,
+memcached instances,
+some background job workers
+and a database.
+Some of these even help you spread your services across pre-existing hardware
+without you needing to make decisions
+(provisioning across a &amp;#8220;cluster&amp;#8221;).&lt;/p&gt;
+
+&lt;h4&gt;Current Solutions&lt;/h4&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Juju&lt;/li&gt;
+&lt;li&gt;Cloud Foundry&lt;/li&gt;
+&lt;li&gt;Open Shift&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;p&gt;Flynn (discussed below) does this job,
+but also aims higher.&lt;/p&gt;
+
+&lt;p&gt;Most of these tools consider themselves,
+or at least market themselves,
+as a PaaS in a box.
+Most provide at least some of the &amp;#8220;Heroku experience&amp;#8221; for developers,
+but currently have fairly fundamental flaws
+that severely limit their potential
+to disrupt the current status quo.
+But that&amp;#8217;s a large topic in itself.&lt;/p&gt;
+
+&lt;p&gt;^1&lt;/p&gt;
+
+&lt;h3&gt;Do it in the cloud: Infrastructure (as a service)&lt;/h3&gt;
+
+&lt;p&gt;This piece is optional,
+and largely orthogonal to the other needs,
+but is something that almost everyone could use.
+You can stop here if you just want to run your application in a colo
+with a fixed number of servers.
+That makes sense for very few people though,
+and makes high availability
+and load-aware scaling much more expensive and/or impossible.&lt;/p&gt;
+
+&lt;p&gt;Plus,
+even my mom knows that &amp;#8220;The Cloud&amp;#8221; is awesome.&lt;/p&gt;
+
+&lt;h4&gt;Current Solutions&lt;/h4&gt;
+
+&lt;ul&gt;
+&lt;li&gt;AWS&lt;/li&gt;
+&lt;li&gt;Google Compute Engine&lt;/li&gt;
+&lt;li&gt;Rackspace Cloud&lt;/li&gt;
+&lt;li&gt;Other folks trying to provide public &lt;a href=&quot;http://www.openstack.org/&quot;&gt;Open Stack&lt;/a&gt; clouds&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;h2&gt;Not (yet) solved problems&lt;/h2&gt;
+
+&lt;h3&gt;One-step, Production-aware Deploys&lt;/h3&gt;
+
+&lt;p&gt;This is the &lt;code&gt;$ git push heroku&lt;/code&gt; part.
+A developer runs one command
+and all of those other pieces in the stack dance as appropriate
+so that your application changes
+without your users noticing.
+You&amp;#8217;ll need:&lt;/p&gt;
+
+&lt;h4&gt;Key Requirements&lt;/h4&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Load-balancer juggling for zero-downtime deploys&lt;/li&gt;
+&lt;li&gt;Automated health checks&lt;/li&gt;
+&lt;li&gt;Rollbacks&lt;/li&gt;
+&lt;li&gt;Backing services managed automatically&lt;/li&gt;
+&lt;li&gt;Scaling up and down via one bullet-proof command (or API)&lt;/li&gt;
+&lt;li&gt;Easy application High Availability&lt;/li&gt;
+&lt;li&gt;Easy ops &amp;#8220;Best Practices&amp;#8221;
+
+&lt;ul&gt;
+&lt;li&gt;Monitoring/Alerting&lt;/li&gt;
+&lt;li&gt;Metrics&lt;/li&gt;
+&lt;li&gt;Log Aggregation&lt;/li&gt;
+&lt;li&gt;Service Registration&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;p&gt;The proprietary PaaS providers use this as their respective secret sauces.&lt;/p&gt;
+
+&lt;h4&gt;Requirements that Can Be Met&lt;/h4&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Staged deploys enforcing HA requirements&lt;/li&gt;
+&lt;li&gt;Datacenter awareness&lt;/li&gt;
+&lt;li&gt;Ability to optimize hardware usage&lt;/li&gt;
+&lt;li&gt;Dev can implement backing services
+using open source recipes
+with close to the Heroku services experience&lt;/li&gt;
+&lt;li&gt;Ops can create backing services
+with their familiar tools&lt;/li&gt;
+&lt;li&gt;Managed backing services
+with persistent disk support
+and integrated backup/restore&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;h4&gt;Emerging solutions&lt;/h4&gt;
+
+&lt;h5&gt;Dokku&lt;/h5&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/progrium/dokku&quot;&gt;Dokku&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;The Docker powered mini-Heroku.
+This is a toy-ish proof of concept powered by Docker.&lt;/p&gt;
+
+&lt;h5&gt;Flynn&lt;/h5&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://flynn.io/&quot;&gt;Flynn&lt;/a&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;$80k+ in funding&lt;/li&gt;
+&lt;li&gt;Staffed by super-smart people
+(including the author of Dokku)&lt;/li&gt;
+&lt;li&gt;Aiming to be the thing that
+the Orchestration tools should have been.&lt;/li&gt;
+&lt;li&gt;Not aiming at solving the infrastructure provisioning problem.&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;h5&gt;Neckbeard&lt;/h5&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/winhamwr/neckbeard&quot;&gt;Neckbeard&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;My project that really doesn&amp;#8217;t deserve to be mentioned in the same category,
+but is the open-sourcing
+of an internal tool
+that solves the problems Flynn aims to solve.
+With the announcement of Flynn,
+I&amp;#8217;d be very,
+very happy
+to rewrite Neckbeard as something powered by Flynn.
+From my reading of the &lt;a href=&quot;https://github.com/flynn/flynn-spec&quot;&gt;Flynn Spec&lt;/a&gt;,
+I would still need:
+* IaaS helpers:
+  Automatically provision ec2 instances,
+  mount EBS volumes
+* Datacenter-aware HA:
+  Don&amp;#8217;t put the whole service in one Availability Zone
+* Use the Flynn API to implement staged rollouts&lt;/p&gt;
+
+&lt;h2&gt;Configuration Management and Orchestration still sucks&lt;/h2&gt;
+
+&lt;p&gt;Even with Chef/Puppet/Saltstack
+and the proliferation of open source,
+reusable code
+(eg. Chef Cookbooks)
+based around things like
+MySQL,
+Memcached,
+and Nginx,
+there&amp;#8217;s still no such thing as
+an off-the-shelve MySQL high-availability setup.
+There&amp;#8217;s no
+&amp;#8220;Here&amp;#8217;s how you configure Redis to survive losing a datacenter
+with no interruption or data loss.&amp;#8221;
+There&amp;#8217;s no
+&amp;#8220;run this command to add another memcached node.&amp;#8221;&lt;/p&gt;
+
+&lt;p&gt;^2&lt;/p&gt;
+
+&lt;p&gt;Even more difficult,
+try mixing and matching these various services
+on machines that aren&amp;#8217;t dedicated to that purpose!&lt;/p&gt;
+
+&lt;p&gt;Heroku and other PaaS providers punt on this problem
+by letting companies sell you &lt;a href=&quot;http://12factor.net/backing-services&quot;&gt;Backing Services&lt;/a&gt;
+that do the hard stuff
+which you can consume over APIs.
+That&amp;#8217;s a great business move
+as long as there are no alternatives for people other than
+&amp;#8220;either hire someone really smart
+who knows how to make MySQL high-availability her bitch,
+or spend a couple years learning about it in production.&amp;#8221;
+Pay an X% markup over infrastructure price
+(plus a chunk to Heroku)
+ to not need to worry about that?&lt;/p&gt;
+
+&lt;p&gt;Hells yeah I will!&lt;/p&gt;
+
+&lt;h2&gt;Enter Docker&lt;/h2&gt;
+
+&lt;p&gt;This is where Docker comes in!&lt;/p&gt;
+
+&lt;p&gt;It&amp;#8217;s difficult and time-consuming
+to learn MySQL well enough to do an awesome HA setup,
+but that knowledge is easily shared
+if someone else needs an identical setup.
+The problem is that no setups are identical.&lt;/p&gt;
+
+&lt;h3&gt;We&amp;#8217;re all Unique Snowflakes&lt;/h3&gt;
+
+&lt;p&gt;Everyone needs to customize things to:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Keep service A from breaking service B
+before they even start.
+&amp;#8220;Shit.
+My Redis package upgrades a library that mysql uses.&amp;#8221;&lt;/li&gt;
+&lt;li&gt;Keep service A from breaking service B occasionally in production.
+&amp;#8220;Balls.
+A uwsgi process hit 400MB in a request
+and RabbitMQ ran out of memory and crashed.&amp;#8221;&lt;/li&gt;
+&lt;li&gt;Keep services X and Y working together after Y fails over.&lt;/li&gt;
+&lt;li&gt;Restore service Y with backed up data
+and make service X aware of the change.&lt;/li&gt;
+&lt;/ol&gt;
+
+
+&lt;h3&gt;You&amp;#8217;re not Special&lt;/h3&gt;
+
+&lt;p&gt;Docker,
+via &lt;a href=&quot;http://en.wikipedia.org/wiki/LXC&quot;&gt;Linux Containers&lt;/a&gt;,
+ allows complete isolation
+so that everyone&amp;#8217;s service X looks the same.
+It does this with requiring heavy virtualization,
+so you can actually use it outside of development.
+This means that your Chef Cookbook
+(or whatever configuration management slash orchestration tool)
+only needs care about a limited set of possibilities.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Service A and B are isolated.
+You can&amp;#8217;t put yourself in dependency hell.
+No more coordinating users,
+groups
+and permissions.&lt;/li&gt;
+&lt;li&gt;You can place strict boxes around resources
+so that service A can&amp;#8217;t
+hog all of service B&amp;#8217;s RAM.&lt;/li&gt;
+&lt;li&gt;(and 4)
+Since the services are in containers,
+I can use any container-aware config management recipes
+and be sure they work in my environment.
+Even better,
+I can test the failure modes on my laptop
+or in a Vagrant config
+running on my laptop.&lt;/li&gt;
+&lt;/ol&gt;
+
+
+&lt;h2&gt;Existing Tools + Docker + ??? = Awesome&lt;/h2&gt;
+
+&lt;p&gt;Now that Docker is a thing,
+the last ingredient towards
+The Solution exists.
+Flynn,
+or whatever wins in the FOSS marketplace of ideas,
+can string together Docker plus the myriad existing FOSS tools
+and build a whole that is much greater than the sum of its parts.
+This kind of tool has several huge advantages
+over any potential commercial PaaS
+or multi-project Enterprise PaaS.&lt;/p&gt;
+
+&lt;p&gt;A FOSS,
+single-entity PaaS
+based on Docker plus existing tools:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Has a focused scope.
+When scope is smaller,
+it&amp;#8217;s easier to deliver a great result.&lt;/li&gt;
+&lt;li&gt;Will encourage more free contribution.&lt;/li&gt;
+&lt;li&gt;Can leverage more existing and continued work
+from established communities.&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;p&gt;These are overwhelming advantages.&lt;/p&gt;
+
+&lt;h3&gt;Advantage: Focused Scope&lt;/h3&gt;
+
+&lt;p&gt;There are a lot of PaaS providers
+with a lot of dedicated development resources.
+Heroku and dotCloud in particular
+have some amazing developers who do amazing work.
+Docker wouldn&amp;#8217;t even exist
+if dotCloud hadn&amp;#8217;t developed and open-sourced it!&lt;/p&gt;
+
+&lt;p&gt;But these companies and projects
+are solving much more than just the deployment/operations problem.
+In order to maintain superiority,
+and holding quality constant,
+a software project needs either faster development
+or smaller scope.&lt;/p&gt;
+
+&lt;h4&gt;Commercial and Enterprise PaaS Scope&lt;/h4&gt;
+
+&lt;p&gt;To run a commercial PaaS like Heroku and dotCloud
+or a segmented,
+multi-user Enterprise Pass,
+you must:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Build a service to allow one-command deployment
+and management of one application
+across one or more containers
+on one or more servers.&lt;/li&gt;
+&lt;li&gt;Operate that service in production with customers.&lt;/li&gt;
+&lt;li&gt;Build and operate a control plane
+to separate multiple apps from the same customer.&lt;/li&gt;
+&lt;li&gt;Build and operate a service
+to control provisioning IaaS resources
+and balance those needs against
+the API requests of many customers
+with many separate apps.&lt;/li&gt;
+&lt;li&gt;Build and operate a customer-facing web interface
+across the whole system
+to give customers app-level insight.&lt;/li&gt;
+&lt;li&gt;Build and operate an API service
+to allow partners
+to register and sell services
+to their customers,
+along with interfaces for those customers
+to use those services.&lt;/li&gt;
+&lt;li&gt;Build and operate managed services for things like
+production databases and Memcached.&lt;/li&gt;
+&lt;/ol&gt;
+
+
+&lt;p&gt;^3&lt;/p&gt;
+
+&lt;h4&gt;Single-Project PaaS Scope&lt;/h4&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Build a service to allow one-command deployment
+and management of one application
+across one or more containers
+on one or more servers.&lt;/li&gt;
+&lt;/ol&gt;
+
+
+&lt;h3&gt;Advantage: More Free Contribution&lt;/h3&gt;
+
+&lt;p&gt;The scope of contribution across various existing tools actually varied quite widely.
+In a broad sense,
+it&amp;#8217;s expected that FOSS projects will receive more contribution,
+but that&amp;#8217;s not necessarily the case.
+It&amp;#8217;s very possible to structure a FOSS project
+such that outside contribution is difficult and rare.
+It&amp;#8217;s also possible for commercial companies to benefit from
+(and contribute to)
+open source.&lt;/p&gt;
+
+&lt;p&gt;What is clear is that a FOSS project with a focused scope
+and thus lower barrier to contribution
+has much higher potential for contribution.
+It&amp;#8217;s also clear that even if some portion of building blocks are open source,
+proprietary software does not have the same potential for contribution.&lt;/p&gt;
+
+&lt;p&gt;With regards to the current state of PaaS options,
+no option is widely benefiting from open contribution.
+With the goal of rebuilding dotCloud on top of Docker,
+dotCloud does appear to be poised to take most advantage,
+however.&lt;/p&gt;
+
+&lt;h4&gt;Proprietary: Heroku&lt;/h4&gt;
+
+&lt;p&gt;Without performing deep analysis,
+it appears that all current Github projects
+under the Heroku organization
+are overwhelmingly driven by Heroku employees.
+Many have dozens of minor community contributions,
+though,
+which certainly helps.
+It&amp;#8217;s also not clear if
+any of the current Heroku employees contributed heavily
+to those projects
+before becoming Heroku employees.
+That should certainly count.&lt;/p&gt;
+
+&lt;h4&gt;Proprietary: dotCloud&lt;/h4&gt;
+
+&lt;p&gt;If we examine dotCloud&amp;#8217;s receipt of open contribution
+before the release of Docker,
+it looks very similar to Heroku.
+Many projects have dozens of contributions,
+but they&amp;#8217;re all very small.
+These are valuable,
+but are not hugely significant
+compared to the contribution of full-time staff.&lt;/p&gt;
+
+&lt;p&gt;Examining the Docker project is a similar story,
+but at a different scope.
+It has largely been led
+by 4 or 5 current or former dotCloud employees,
+but in it&amp;#8217;s short existence
+has received contribution
+from over 100 outside committers.&lt;/p&gt;
+
+&lt;h4&gt;OS: Open Shift&lt;/h4&gt;
+
+&lt;p&gt;The Open Shift project appears to be open source with a one-way valve.
+While the &lt;a href=&quot;https://github.com/openshift/origin-server&quot;&gt;origin-server&lt;/a&gt; source code
+is available,
+I was unable to locate a single contributor
+who didn&amp;#8217;t appear to be a Red Hat employee.
+This is effectively open source as advertising
+and Open Shift shouldn&amp;#8217;t be evaluated
+as if a growing community would accelerate its improvement.&lt;/p&gt;
+
+&lt;h4&gt;OS: Cloud Foundry&lt;/h4&gt;
+
+&lt;p&gt;Like Cloud Foundry,
+Open Shift mostly drops the &amp;#8220;Free to improve&amp;#8221; section of FOSS.
+They have at least made some effort to encourage contribution,
+and do appear willing to accept it.
+I was able to find at least a few very minor contributors
+to &lt;a href=&quot;https://github.com/cloudfoundry/cf-release&quot;&gt;cf-release&lt;/a&gt;
+who at least didn&amp;#8217;t appear to be commercially associated.&lt;/p&gt;
+
+&lt;h3&gt;Advantage: Existing Communities&lt;/h3&gt;
+
+&lt;p&gt;Outside of a core that is more-focused
+and much greater potential for shared contribution to that core,
+a single-tenant FOSS PaaS based on existing tools
+can re-use a lot of existing work.&lt;/p&gt;
+
+&lt;p&gt;Looking just at &lt;a href=&quot;https://github.com/search?q=chef&quot;&gt;Chef-related&lt;/a&gt;
+and &lt;a href=&quot;https://github.com/search?q=puppet&quot;&gt;Puppet-related&lt;/a&gt;
+projects on Github
+reveals thousands of projects
+with thousands of developers able to contribute.&lt;/p&gt;
+
+&lt;p&gt;Heroku does boast nearly 100 &lt;a href=&quot;https://addons.heroku.com/&quot;&gt;Add-ons&lt;/a&gt;,
+this number pairs on comparison.
+Further,
+there&amp;#8217;s no reason our envisioned FOSS PaaS
+couldn&amp;#8217;t use every single one of those add-ons,
+perhaps with a bit less slick sign-up process.&lt;/p&gt;
+
+&lt;h2&gt;Footnotes&lt;/h2&gt;
+
+&lt;p&gt;1: I reserve the right to be completely wrong about Cloud Foundry.
+They&amp;#8217;re at least &lt;a href=&quot;https://github.com/cloudfoundry/bosh-lite&quot;&gt;experimenting&lt;/a&gt;
+with Docker for the tool that deploys Cloud Foundry.
+I might just not be smart enough
+to &lt;a href=&quot;http://docs.cloudfoundry.com/docs/running/bosh/components/&quot;&gt;understand Cloud Foundry&lt;/a&gt;.
+Heck,
+I don&amp;#8217;t really even understand
+the &lt;a href=&quot;https://github.com/cloudfoundry/bosh&quot;&gt;tool&lt;/a&gt; they wrote
+to deploy Cloud Foundry itself!?
+I&amp;#8217;m told by someone I trust who kind of understands it
+that the architecture is really cool.
+It also looks like basically everything
+is undergoing a major V2/NG rewrite,
+so maybe they&amp;#8217;ll get more hackable,
+more composable,
+and more ops-friendly
+before Flynn does it&amp;#8217;s thing.
+I hope it happens.&lt;/p&gt;
+
+&lt;p&gt;2: Orchestration tools like Juju aim to provide this
+with hooks to define and consume services
+and hooks to handle change events
+but that only gives you a framework
+to solve the problem yourself.
+Even with example Juju charms,
+for example,
+you have the same problem as with &amp;#8220;reusable&amp;#8221; Chef Cookbooks.&lt;/p&gt;
+
+&lt;p&gt;3: Theoretically,
+you don&amp;#8217;t need to operate a FOSS Enterprise PaaS
+in order to build it,
+but both Open Shift
+and Cloud Foundry do operate paid versions.&lt;/p&gt;
+
+&lt;p&gt;you&lt;/p&gt;
+</content>
+  </entry>
+  
+  <entry>
+    <title>The Perverse Incentives of Public Health Care</title>
+    <link href="http://winhamwr.github.com/blog/2013/01/29/the-perverse-incentives-of-public-healthcare/"/>
+    <updated>2013-01-29T19:27:00-05:00</updated>
+    <id>http://winhamwr.github.com/blog/2013/01/29/the-perverse-incentives-of-public-healthcare</id>
+    <content type="html">&lt;p&gt;I see many &lt;a href=&quot;http://www.undeniableruth.com/2013/01/29/my-thoughts-on-the-american-health-care-problem/comment-page-1/#comment-86789&quot;&gt;smart, thoughtful, well-meaning people&lt;/a&gt;
+that are unaware of the overwhelming evidence
+that increasing general health actually &lt;strong&gt;increases&lt;/strong&gt; health care costs.
+This is especially true for reductions in partially-preventable chronic disease,
+which have the most dramatic affect on lifespan.
+Reducing smoking and obesity will actually make the fiscal situations &lt;em&gt;worse&lt;/em&gt;
+for the citizens in countries that have chosen to
+publicly share/bare health care costs.
+For countries who disproportionately share the cost of elderly care,
+such as the US,
+this affect is only amplified.&lt;/p&gt;
+
+&lt;p&gt;Focusing efforts on improving healthy is a noble goal,
+but the evidence is very clear that healthy people spend &lt;em&gt;more&lt;/em&gt; on health care.
+The longer you live,
+and especially the longer you live at advanced age,
+the more your total medical costs increase (on average).
+In the US,
+under both the previous and ACA-modified regulatory/legal regimes,
+the conversation centers around controlling costs.
+Perversely,
+the best thing a person can do for their lifetime healthcare cost
+is to die young of preventable diseases.&lt;/p&gt;
+
+&lt;p&gt;Some references to that affect:&lt;/p&gt;
+
+&lt;h2&gt;People with chronic diseases are cheaper&lt;/h2&gt;
+
+&lt;p&gt;For 65-yo couples, the mean and 5% expected expenses for:
+* No chronic disease: $260k and $570k
+* With chronic disease: $220k and $465k&lt;/p&gt;
+
+&lt;p&gt;http://crr.bc.edu/wp-content/uploads/2010/05/IB_10-8.pdf&lt;/p&gt;
+
+&lt;h2&gt;People that live longer cost more&lt;/h2&gt;
+
+&lt;p&gt;http://www.ncbi.nlm.nih.gov/pmc/articles/PMC1361028/&lt;/p&gt;
+
+&lt;h2&gt;For lifetime healthcare costs: Healthy people &gt; obese people &gt; smokers&lt;/h2&gt;
+
+&lt;p&gt;http://www.plosmedicine.org/article/info:doi/10.1371/journal.pmed.0050029&lt;/p&gt;
+
+&lt;p&gt;Based on currently-available information,
+I see no hope for reducing costs by increasing health.
+It’s actually counter-productive.&lt;/p&gt;
+
+&lt;p&gt;To me,
+the measurement of a health care regulatory/legal regime is not cost,
+but medical outcomes (which are dominated by technology improvements)
+and by individual choice.
+People matter.
+It’s a perverse game to judge a system by cost
+or surface things like patient satisfaction,
+but that’s what our previous system brought.
+The ACA seems set to only accelerates those trends.&lt;/p&gt;
+
+&lt;p&gt;Few would want to live in a world where food ownership was controlled federally and we debated over how to ration food in order to properly optimize everyone’s nutrition, but somehow well-meaning folks see health insurance differently. The only substantive difference is that healthcare costs are not predictable and evenly-distributed like food costs. That’s why I’d prefer the simplest-possible universal catastrophic coverage system to eliminate that difference and make it clear that economics and incentives apply equally to ribeye steaks, hydroponic vegetables, annual physicals and cardiac bypass surgery.&lt;/p&gt;
+</content>
+  </entry>
+  
+</feed>
