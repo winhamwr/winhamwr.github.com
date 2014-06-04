@@ -59,3 +59,11 @@ What about for keepers? (separate problem)
 * Embrace slightly more, much simpler queries
 * Aggregates can and will destroy you
 * For the other 20%, use New Relic and the "Apdex most dissatisfying" report
+
+## Build Mobile Pacers Bikeshare Site
+
+https://www.pacersbikeshare.org/header-nav/station-map/
+
+* `LoadKiosks()` has the data and pushes objects to `kioskpoints` and `markers`
+* [pjscrape](https://github.com/nrabinowitz/pjscrape)
+* [zombie](http://zombie.labnotes.org/API)
