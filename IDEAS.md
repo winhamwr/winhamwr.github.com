@@ -67,3 +67,14 @@ https://www.pacersbikeshare.org/header-nav/station-map/
 * `LoadKiosks()` has the data and pushes objects to `kioskpoints` and `markers`
 * [pjscrape](https://github.com/nrabinowitz/pjscrape)
 * [zombie](http://zombie.labnotes.org/API)
+
+## Cognitive advantages of neurodiverse folks
+
+* Autism has [real costs](http://slatestarcodex.com/2015/10/12/against-against-autism-cures/). It's a big bundle of things that often comes with a big list of negatives. Most autistic folks suffer.
+* Even if the big negatives are avoided and someone has a high enough IQ to compensate when dealing with normal humans, folks on the spectrum are at a disadvantage. Most humans default to assuming other humans think like them and are motivated like them, and for most folks, that's a good default. It's not good or spectrum folks, so they tend to be disadvantaged in social interactions. It's better to be good with people than to be good with things.
+* For some percentage of folks on the spectrum (typically labeled with Aspergers),
+  the condition typically comes with cognitive advantages relative to dealing with things
+  (and, when properly trained, also dealing with humans in structured, practiced scenarios).
+  * Humans love narratives, but narratives are misleading. Much of the Thinking, Fast and Slow-style biases to be corrected are because we use heuristics based on narratives instead of probabalistic thinking. Spectrum folks form fewer information-hiding narratives.
+  * [Social Desirability Bias](http://econlog.econlib.org/archives/2015/10/social_undesira.html) leads people to the wrong answers whenever one is working on the frontier of knowledge. Spectrum folks are much less likely to fall prey (either because they don't notice, or have different preferences wrt knowledge versus positive social feedback).
+  * Humans love consuming information about people, especially famous/influential people and people they know. This tribal gossip affinity makes evolutionary sense, but that love can crowd out information about things. It's information about things (of which psychology is a thing, but a specific person's psychology isn't) that change the world. 
